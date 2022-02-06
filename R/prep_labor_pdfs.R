@@ -1,3 +1,16 @@
+#' Title
+#'
+#' @param pdf_df a single dataframe from the list produced by pdftools::pdf_data()
+#' @param relevant_filter stringr::regex() expression containing text to search for to define the where the columns along the x axis
+#' @param empty_filter stringr::regex() expression containing string patterns that will be changed to NA
+#' @param wanted_labs stringr::regex() expression containing labor parameters needed
+#' @param y_upper_limit stringr::regex() expression for upper limit to include (usually name of the first column)
+#' @param stop_term stringr::regex() expression to stop at if encountered
+#'
+#' @return a named list (after labor parameters) containing date_time and value
+#' @export
+#'
+#' @examples
 prep_labor_pdf_pages <- function(pdf_df,
                                  relevant_filter,
                                  empty_filter,
@@ -73,7 +86,7 @@ prep_labor_pdf_pages <- function(pdf_df,
                 dplyr::group_by(y) %>%
                 tidyr::pivot_wider(names_from = x, values_from = text, names_sort = TRUE) %>%
                 tidyr::unite(
-                    auftrag, tidyselect::where(is.character), sep = " ") %>%
+                    auftrag, where(is.character), sep = " ") %>%
                 dplyr::mutate(
                     auftrag = stringr::str_remove_all(auftrag, "NA") %>% stringr::str_squish()) %>%
                 dplyr::select(-grp)
@@ -90,11 +103,11 @@ prep_labor_pdf_pages <- function(pdf_df,
     #browser()
     if(dim(out)[2] >= 3) {
 
-        new_names <- out %>% dplyr::ungroup %>%
+        new_names <- out %>% dplyr::ungroup() %>%
             dplyr::slice_head(n = 2) %>%
             dplyr::mutate(
-                dplyr::across(tidyselct::everything(), ~ stringr::str_c(.x, lead(.x), sep = "_"))
-            ) %>% dplyr::unite(new_names, 3:tidyselect::last_col(), sep = "###") %>%
+                dplyr::across(tidyselect::everything(), ~ stringr::str_c(.x, dplyr::lead(.x), sep = "_"))
+            ) %>% tidyr::unite(new_names, 3:tidyselect::last_col(), sep = "###") %>%
             .[1,3] %>%
             dplyr::pull() %>%
             stringr::str_split(., "###") %>%
@@ -130,10 +143,10 @@ prep_labor_pdf_pages <- function(pdf_df,
 
     #browser()
     out <- out %>%
-        tidyr::pivot_longer(2:last_col(), names_to = "date_time", values_to = "value") %>%
+        tidyr::pivot_longer(2:tidyselect::last_col(), names_to = "date_time", values_to = "value") %>%
         dplyr::distinct() %>%
         dplyr::mutate(
-            dplyr::across(tidyselect::where(is.character), dplyr::na_if, "empty"),
+            dplyr::across(where(is.character), dplyr::na_if, "empty"),
             date_time = lubridate::dmy_hm(date_time)
         ) %>%
         tidyr::drop_na() %>%
