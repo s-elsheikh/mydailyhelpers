@@ -13,8 +13,14 @@ Imports:
     dplyr,
     lubridate,
     magrittr,
+    pdftools,
     purrr,
+    qpdf,
     stringr,
     tibble,
     tidyr,
     tidyselect
+Suggests: 
+    rmarkdown,
+    knitr
+VignetteBuilder: knitr

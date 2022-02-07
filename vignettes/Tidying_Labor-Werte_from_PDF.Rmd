@@ -1,0 +1,125 @@
+---
+title: "Tidying_Labor-Werte_from_PDF"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tidying_Labor-Werte_from_PDF}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mydailyhelpers)
+```
+
+Required libraries:
+
+```{r eval=FALSE}
+
+library(tidyverse)
+library(pdftools)
+
+```
+
+
+
+Sometimes when carrying out a study, there is a need to process the laboratory information of many patients over  the period of the study. **After getting the approval of the ethics committee and the appropiate patient consent** download the required lab results, and print as a pdf.
+
+```{r eval=FALSE}
+
+# Here enter the path where you stored the pdfs
+
+pdf_paths <- dir("./patienten_suche/labor_werte/labor_pdfs",
+                 full.names = TRUE,
+                 pattern = "pdf")
+```
+
+
+the first function: mydailyhelpers::prep_labor_pdf_pages() takes the following functions:
+
+1. path to pdf.
+2. Regex-expression representing the relevant words representing the columns 
+3. Regex-expression representing the empty fields. Will be returned as NA
+4. Regex-expression containing the labor parameters wanted. E. g. creatinin, glukose. This is case sensitive.
+5. Regex-expression representing the upper limit to include. This is usually the name of the left most column from 2.
+6. Regex-expression representing a term, as the lower limit to include (for pages containing both vaild results and comments)
+
+
+```{r eval=FALSE}
+reg_filt <- regex(
+  "^Auftragsdatum$|bereich|(?<!\\*)(\\d{2}\\.){2}\\d\\d")
+
+empty_filt <- regex("\\.{6,14}")
+
+y_up <- regex("^Auftragsdatum$")
+st_term <- regex("Kommentar")
+wanted_lab_filter <- regex("Glukose|Hb\\sA1c|Hb\\sA1C|Creatinin|Quick|PTT")
+```
+
+
+Running the function on a single PDF file returns a list of labor parameters with date_time per page of the original PDF
+
+```{r eval=FALSE}
+pdf_list <- pdftools::pdf_data(pdf_paths[1])
+
+tab_list <- 
+    pdf_list %>% 
+    future_map(prep_labor_pdf_pages, 
+        reg_filt,
+        empty_filt,
+        wanted_lab_filter,
+        y_up, 
+        st_term)
+
+```
+
+The resulting list, shold be combined across all pages using the second function in the package
+
+```{r eval=FALSE}
+combined_list <- tab_list %>% combine_lab_pages()
+
+```
+
+
+Alternatively all PDFS in a directory could be read and evaluated. Iteration using the map() function from the purrr package can be used. This produces a nested list.
+
+```{r eval=FALSE}
+big_out <- pdf_paths %>% 
+  set_names(nm = str_extract(., "\\d{8}")) %>% # pass personal id nummber as names for the list elements
+  
+  map(function(path){
+  pdf_list <- pdf_data(path)
+  tab_list <- 
+    pdf_list %>% 
+    future_map(prep_labor_pdf_pages, 
+        reg_filt,
+        empty_filt,
+        wanted_lab_filter,
+        y_up, 
+        st_term)
+  combined_list <- tab_list %>% combine_lab_pages()
+  }
+  )
+```
+
+
+the following code combines all results from all patients into one tibble, to allow wrangling and filtering.
+
+first, bind_rows() is mapped to the inner list, then reapplied to the outer list to produce the tidy table
+
+```{r eval=FALSE}
+big_out %>% map_depth(1, bind_rows, .id = "labor_param") %>% 
+  bind_rows(.id = "piz")
+```
+
+
+
+
+
+
