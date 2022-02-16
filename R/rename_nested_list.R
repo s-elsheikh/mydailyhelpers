@@ -22,10 +22,16 @@ rename_nested_list <- function(nested_list, pattern, replacement) {
             replacement
         ),
         ~{
-            if (inherits(.x, "list")) {
+            if (is.list(.x)) {
                 rename_nested_list(., pattern, replacement)
+            # } else if (is.vector(.x)) {
+            #     names(.x) <- stringr::str_replace_all(names(.x), pattern, replacement)
             } else {
+                if (!is.null(names(.x))){
+                    names(.x) <- stringr::str_replace_all(names(.x), pattern, replacement)
+                }
                 .x
             }
-        })
+        }
+        )
 }
