@@ -3,5 +3,6 @@
 export("%>%")
 export(combine_lab_pages)
 export(prep_labor_pdf_pages)
+export(rename_nested_list)
 export(tidy_nested_lists)
 importFrom(magrittr,"%>%")

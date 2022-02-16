@@ -2,7 +2,7 @@
 % Please edit documentation in R/tidy_nested_lists.R
 \name{tidy_nested_lists}
 \alias{tidy_nested_lists}
-\title{Title}
+\title{Title Tidy nested list into tibble}
 \usage{
 tidy_nested_lists(nested_list)
 }
@@ -13,5 +13,9 @@ tidy_nested_lists(nested_list)
 tidy tibble. column names are numbered 0 based, to correspond to the depth argument in maap_depth()
 }
 \description{
-Title
+This functions returns a tidy tibble from a nested list, preserving hierarchy of nestingg levels and adding NA where
+appropriate. backbone is the base R function unlist(), which returns a named vector of all values in the lsit.
+names a re concatenated with a "." as separator. LAter the names are separated using sep = "\\.".
+If the names of the nested list happen to contain "." they will be internally replaced with "_". At the end,
+the original name will be restored
 }
