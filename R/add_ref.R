@@ -28,6 +28,7 @@ add_ref <- function(bib_path){
         cat(new_ref, "added to file")
     } else cat(new_ref, "already in bibtex")
 
+
     new_ref %>%
         stringr::str_remove("\n") %>%
         utils::writeClipboard()
