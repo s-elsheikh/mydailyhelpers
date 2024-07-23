@@ -18,16 +18,21 @@ prep_labor_pdf_pages <- function(pdf_df,
                                  y_upper_limit,
                                  stop_term){
 
+    # check if a relevant page or not
+    if(max(str_detect(pdf_df$text, stop_term)) != 0) return(NULL)
+
+
+    # check for empty fields = 6x point
+
     prepped_page <- pdf_df %>%
         dplyr::select(x,y,text) %>%
         dplyr::arrange(y,x) %>%
         dplyr::mutate(
             text = dplyr::if_else(stringr::str_detect(text, empty_filter),
-                           "empty",
-                           text)
+                                  "empty",
+                                  text)
         )
-
-
+    # x coordinates of each column
     relevant_coords <-
         prepped_page %>%
         dplyr::arrange(x) %>%
@@ -36,11 +41,11 @@ prep_labor_pdf_pages <- function(pdf_df,
 
         )
     # browser()
-
+    # find top y coord
     y_top <- relevant_coords %>% # find top y coord
         dplyr::filter(stringr::str_detect(text, y_upper_limit)) %>%
         dplyr::pull(y)
-
+    # stop before "Kommentar" to prevent garbage or errors
     stop_y_location <-  prepped_page %>% # find y coord to stop
         dplyr::filter(
             stringr::str_detect(text, stop_term)
