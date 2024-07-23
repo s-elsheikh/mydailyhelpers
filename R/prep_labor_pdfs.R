@@ -19,7 +19,7 @@ prep_labor_pdf_pages <- function(pdf_df,
                                  stop_term){
 
     # check if a relevant page or not
-    if(max(str_detect(pdf_df$text, stop_term)) != 0) return(NULL)
+    if(max(str_detect(pdf_df$text, y_upper_limit)) == 0) return(NULL)
 
 
     # check for empty fields = 6x point
