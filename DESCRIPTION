@@ -1,6 +1,6 @@
 Package: mydailyhelpers
 Title: These Are Miscellaneous Helpers for Other Projects
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     person("Samer", "Elsheikh", , "samer.elsheikh@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3796-5709"))
