@@ -2,7 +2,7 @@
 % Please edit documentation in R/prep_labor_pdfs.R
 \name{prep_labor_pdf_pages}
 \alias{prep_labor_pdf_pages}
-\title{Title}
+\title{Title Create tidy table from labor PDF}
 \usage{
 prep_labor_pdf_pages(
   pdf_df,
@@ -10,7 +10,8 @@ prep_labor_pdf_pages(
   empty_filter,
   wanted_labs,
   y_upper_limit,
-  stop_term
+  stop_term,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -25,10 +26,12 @@ prep_labor_pdf_pages(
 \item{y_upper_limit}{stringr::regex() expression for upper limit to include (usually name of the first column)}
 
 \item{stop_term}{stringr::regex() expression to stop at if encountered}
+
+\item{verbose}{prints piz and page number of the dicument being processed to console}
 }
 \value{
 a named list (after labor parameters) containing date_time and value
 }
 \description{
-Title
+Title Create tidy table from labor PDF
 }
