@@ -10,6 +10,12 @@
 #'
 #' @examples
 add_ref <- function(bib_path){
+    # browser()
+
+    if(!file.exists(bib_path)){
+        cat("bib file does not exist: creating.\n")
+        file.create(bib_path)
+    }
 
     old_refs <-
         readr::read_lines(bib_path) %>%
@@ -21,7 +27,15 @@ add_ref <- function(bib_path){
         stringr::str_subset("^@") %>%
         stringr::str_extract("(?<=\\{).+(?=,)")
 
-    if(!new_ref %in% old_refs) {
+    if (length(old_refs) == 0)
+        { test_in_bib <- TRUE
+    }
+    else if (new_ref %in% old_refs)
+        { test_in_bib <- FALSE}
+    else
+        {test_in_bib <- TRUE}
+
+    if (test_in_bib) {
         utils::readClipboard() %>%
             readr::write_lines(bib_path,
                         append = TRUE)
