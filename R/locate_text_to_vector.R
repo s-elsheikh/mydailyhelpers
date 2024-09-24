@@ -22,14 +22,21 @@
 #' df <- tibble::tibble(col_id = letters[1:2], col_text = c("I love ananas", "I love lololo"))
 #' df |> dplyr::rowwise() |> dplyr::mutate(lo = list(locate_text_to_vector(col_text, "lo", 2, 7)))
 locate_text_to_vector <- function(col,pattern, back_window = 10, front_window = 80){
-    #browser()
-    posis <- stringr::str_locate_all(col, pattern) |>
-        unlist() |>
-        {function(x) x[1:(length(x)/2)]}()
+    # browser()
+    # if the string is short, always keep sub aurguments
+    # within nchar of string
+    # added str_to_lower here
+    posis_list <- stringr::str_locate_all(col, pattern)
+    posis <- posis_list[[1]][,1]
 
-    out <- purrr::map_chr(posis, ~ stringr::str_sub(string = col,
-                             start = .x - back_window,
-                             end = .x + front_window)
+    out <- purrr::map_chr(posis, ~ stringr::str_sub(string = stringr::str_to_lower(col),
+                                                    start = dplyr::if_else(.x - back_window >0,
+                                                                           .x - back_window,
+                                                                           0L),
+                                                    end = dplyr::if_else(.x + front_window > nchar(col),
+                                                                         -1L,
+                                                                         .x + front_window)
+    )
     )
 
     return(out)
