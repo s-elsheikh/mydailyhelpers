@@ -11,18 +11,28 @@
 #' @export
 #'
 #' @examples
-text_vector_df <- function(df, col_name, search_text,
-                           b_win = 10, f_win = 80){
+text_vector_df <- function(df,
+                           col_to_search,
+                           output_col,
+                           search_text,
+                           b_win = 10,
+                           f_win = 80){
 
+    browser()
+
+    ensym_col_to_search <- ensyms(col_to_search)
+    out_c <- ensym(output_col)
+
+    out
 
     out <- df %>%
         dplyr::rowwise() %>%
         dplyr::mutate(
-            "{col_name}" := list(locate_text_to_vector(stringr::str_to_lower(text),
+            "{out_c}" := list(locate_text_to_vector(stringr::str_to_lower(!!ensym_col_to_search),
                                                        search_text, b_win, f_win))
         ) %>%
-        tidyr::unnest(!!col_name) %>%
-        dplyr::relocate(!!col_name, .after = doc_id) %>%
+        tidyr::unnest(!!out_c) %>%
+        dplyr::relocate(!!out_c, .after = 1) %>%
         dplyr::ungroup()
 
     return(out)
