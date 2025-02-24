@@ -30,7 +30,7 @@ prep_labor_pdf_pages(
 \item{verbose}{prints piz and page number of the dicument being processed to console}
 }
 \value{
-a named list (after labor parameters) containing date_time and value
+a tibble containing date_time and value
 }
 \description{
 Title Create tidy table from labor PDF

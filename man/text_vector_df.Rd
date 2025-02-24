@@ -4,19 +4,26 @@
 \alias{text_vector_df}
 \title{Title Search for specific text in output DF of readtext::readtext()}
 \usage{
-text_vector_df(df, col_name, search_text, b_win = 10, f_win = 80)
+text_vector_df(
+  df,
+  col_to_search,
+  output_col,
+  search_text,
+  b_win = 10,
+  f_win = 80
+)
 }
 \arguments{
 \item{df}{Tibble resulting form readtext::readtext(). must contain doc_id and
 text columns}
-
-\item{col_name}{quoted character string: name of new column containg results of search}
 
 \item{search_text}{quoted character string: regex pattern to search for}
 
 \item{b_win}{integer: nnumber of characters before search strung to show}
 
 \item{f_win}{integer: nnumber of characters after search strung to show}
+
+\item{col_name}{quoted character string: name of new column containg results of search}
 }
 \value{
 Tibble, second column is the requested column

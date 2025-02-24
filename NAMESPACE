@@ -2,9 +2,12 @@
 
 export("%>%")
 export(add_ref)
+export(ci_square_brackets)
 export(combine_lab_pages)
+export(format_num_denom_accuracy_measures)
 export(locate_text_to_vector)
 export(num_2_words)
+export(num_denom_accuracy_measures)
 export(prep_labor_pdf_pages)
 export(ref_in_browser)
 export(rename_nested_list)
