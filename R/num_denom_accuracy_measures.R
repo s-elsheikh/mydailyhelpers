@@ -48,10 +48,16 @@ num_denom_accuracy_measures <- function(cm, positive_class){
         dplyr::left_join(summary_stats)
 
     get_ci <- function(x, tot, which_ci){
+        # if total is 0 binom.test returns an error
 
-        t_result <- stats::binom.test(x, tot)
+        if (tot == 0){
+            ci <- rep(as.numeric(NA), 2)
+        } else {
+            t_result <- stats::binom.test(x, tot)
 
-        ci <- t_result$conf.int
+            ci <- t_result$conf.int
+        }
+
         if (which_ci == "l")
             return(ci[1])
         else if (which_ci == "u")
