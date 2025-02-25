@@ -19,20 +19,29 @@ num_denom_accuracy_measures <- function(cm, positive_class){
         dplyr::mutate(
             name = dplyr::case_when(
                 Prediction == positive_class & Prediction == Truth ~ "tp",
-                Prediction == positive_class & Prediction != Truth ~ "fn",
+                Prediction == positive_class & Prediction != Truth ~ "fp",
                 Prediction != positive_class & Prediction == Truth ~ "tn",
-                Prediction != positive_class & Prediction != Truth ~ "fp",
+                Prediction != positive_class & Prediction != Truth ~ "fn",
             )
         )%>% dplyr::select(name, n) %>%
         tibble::deframe()
+    # summary fnction inf conf_matrix always assumes thet event is first,
+    # so if event is second, this has to be recognised
 
-    summary_stats <- summary(cm)
+    levels <- cm$table %>%
+        tibble::as_tibble() %>%
+        dplyr::distinct(Truth) %>%
+        dplyr::pull()
+
+    if (which(levels == positive_class) == 1) event <- "first" else event <- "second"
+
+    summary_stats <- summary(cm, event_level = event)
 
     out_numer_denom <- tibble::tribble(
         ~ ".metric", ~ "num", ~"denom",
         "accuracy", sum(tp_fps[c("tp", "tn")]), sum(tp_fps),
-        "sens", tp_fps["tp"], sum(tp_fps[c("tp", "fp")]),
-        "spec", tp_fps["tn"], sum(tp_fps[c("tn", "fn")])
+        "sens", tp_fps["tp"], sum(tp_fps[c("tp", "fn")]),
+        "spec", tp_fps["tn"], sum(tp_fps[c("tn", "fp")])
     )
 
     out_estimate <- out_numer_denom %>%
