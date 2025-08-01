@@ -2,6 +2,8 @@
 #'
 #' @param tib Tibble from num_denom_accuracy_measures()
 #' @param output String, c("value_only", "num_denom", "ci", "both")
+#' @param num_denom_separator String: separator for num-denom entries. text will
+#' be paded with 1 space on each side, others will be passed unchaged to the output
 #' @param round_digs Int: number of digits to round to
 #'
 #'
@@ -13,16 +15,20 @@
 #' ci: returns CI only
 #' both: (Default) Returns both num/denum and CI
 #'
-#' @returns String fomrated ready for Publication containing acc, sens and spec
+#' @returns
+#' String fomrated ready for Publication containing acc, sens and spec
 #' with/without CI and or numerator and denominator
 #' @export
 #'
 #' @examples
-format_num_denom_accuracy_measures  <- function(tib, output = "both",
+format_num_denom_accuracy_measures  <- function(tib,
+                                                output = "both",
+                                                num_denom_separator = "of",
                                                 round_digs = 2){
 
     # this function takes tibble from num_denom_accuracy_measures(),
-    # wanted output format and digit rounding
+    # wanted output format  separator for CI
+    # and digit rounding
     # and returns a named vector, good for text
     # and possibly results tables
     # Auto naming the list was somewhat problematic
@@ -32,6 +38,16 @@ format_num_denom_accuracy_measures  <- function(tib, output = "both",
 
     if( !output %in% valid_reses)
         stop(cat("invalid result\nmust be one of\n", valid_reses, "\n"))
+
+    # check if CI_separator is letters, then has to be paded with
+    # preceeding and following spaces
+    if(grepl("[a-zA-Z]",num_denom_separator)){
+        # check if spaces before and after, and add
+        num_denom_separator <- stringr::str_pad(num_denom_separator,
+                         nchar(num_denom_separator),
+                         side = "both")
+        }
+
 
     rounded_tib <- tib %>%
         dplyr::mutate(dplyr::across(dplyr::where(is.numeric), ~ round(.x, digits = round_digs)))
@@ -59,11 +75,11 @@ format_num_denom_accuracy_measures  <- function(tib, output = "both",
                              else if (desired_format == "num_denom") {
                                  out <-
 
-                                     c(glue::glue('{.estimate} ({num} of {denom})'))
+                                     c(glue::glue('{.estimate} ({num}{num_denom_separator}{denom})'))
                              }
                              else if (desired_format == "both") {
                                  out <-
-                                     c(glue::glue('{.estimate} ({num} of {denom}; 95% CI: {ci_low}, {ci_hi})'))
+                                     c(glue::glue('{.estimate} ({num}{num_denom_separator}{denom}; 95% CI: {ci_low}, {ci_hi})'))
 
                              }
                              # returned a named vector

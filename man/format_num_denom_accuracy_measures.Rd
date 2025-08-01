@@ -4,12 +4,20 @@
 \alias{format_num_denom_accuracy_measures}
 \title{Title Format summary stats into CI string for Publication}
 \usage{
-format_num_denom_accuracy_measures(tib, output = "both", round_digs = 2)
+format_num_denom_accuracy_measures(
+  tib,
+  output = "both",
+  num_denom_separator = "of",
+  round_digs = 2
+)
 }
 \arguments{
 \item{tib}{Tibble from num_denom_accuracy_measures()}
 
 \item{output}{String, c("value_only", "num_denom", "ci", "both")}
+
+\item{num_denom_separator}{String: separator for num-denom entries. text will
+be paded with 1 space on each side, others will be passed unchaged to the output}
 
 \item{round_digs}{Int: number of digits to round to}
 }
