@@ -2,7 +2,7 @@
 % Please edit documentation in R/text_vector_df.R
 \name{text_vector_df}
 \alias{text_vector_df}
-\title{Title Search for specific text in output DF of readtext::readtext()}
+\title{Title Search for specific text in tibble text column}
 \usage{
 text_vector_df(
   df,
@@ -14,10 +14,10 @@ text_vector_df(
 )
 }
 \arguments{
-\item{df}{Tibble resulting form readtext::readtext(). must contain doc_id and
-text columns}
+\item{df}{Tibble containing a chatacter column. unique identifier is expectd in
+first column}
 
-\item{search_text}{quoted character string: regex pattern to search for}
+\item{search_text}{quoted character string: regex pattern to search for. small letters only!!!}
 
 \item{b_win}{integer: nnumber of characters before search strung to show}
 
@@ -29,5 +29,5 @@ text columns}
 Tibble, second column is the requested column
 }
 \description{
-Title Search for specific text in output DF of readtext::readtext()
+Title Search for specific text in tibble text column
 }

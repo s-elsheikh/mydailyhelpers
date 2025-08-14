@@ -1,10 +1,9 @@
 #' Locate Pattern in Character Columns within Mutate
 #'
-#' Tibble mut grouped first using rowwise()
 #' Used within mutate(). Takes column name (unquoted) and text (in quotes),
 #' searches for text in this column, and returns its location. Then text is
 #' extracted and returned as a charachter vector
-#' Mutate call has to be within a list, that is later unnet
+#' Mutate call has to be within a list, that is later unnested
 #'
 #'
 #'
@@ -21,24 +20,32 @@
 #' @examples
 #' df <- tibble::tibble(col_id = letters[1:2], col_text = c("I love ananas", "I love lololo"))
 #' df |> dplyr::rowwise() |> dplyr::mutate(lo = list(locate_text_to_vector(col_text, "lo", 2, 7)))
-locate_text_to_vector <- function(col,pattern, back_window = 10, front_window = 80){
+locate_text_to_vector <- function(col, pattern, back_window = 10, front_window = 80){
     # browser()
     # if the string is short, always keep sub aurguments
     # within nchar of string
     # added str_to_lower here
-    posis_list <- stringr::str_locate_all(col, pattern)
-    posis <- posis_list[[1]][,1]
+    locate_text_to_vector <- function(text_vec, pattern, back_window = 10, front_window = 80){
+        # browser()
+        # if the string is short, always keep sub aurguments
+        # within nchar of string
+        # added str_to_lower here
+        text_vec <- stringr::str_to_lower(text_vec)
 
-    out <- purrr::map_chr(posis, ~ stringr::str_sub(string = stringr::str_to_lower(col),
-                                                    start = dplyr::if_else(.x - back_window >0,
-                                                                           .x - back_window,
-                                                                           0L),
-                                                    end = dplyr::if_else(.x + front_window > nchar(col),
-                                                                         -1L,
-                                                                         .x + front_window)
-    )
-    )
+        purrr::map(
+            text_vec,
+            function(txt) {
+                if (is.na(txt)) return(NA_character_)
 
-    return(out)
+                posis_list <- stringr::str_locate_all(txt, pattern)
+                if (length(posis_list[[1]]) == 0) return(NA_character_)
+
+                starts <- pmax(posis_list[[1]][, 1] - back_window, 1)
+                ends   <- pmin(posis_list[[1]][, 1] + front_window, nchar(txt))
+
+                stringr::str_sub(txt, starts, ends)
+            }
+        )
+    }
 
 }

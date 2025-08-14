@@ -1,9 +1,9 @@
-#' Title Search for specific text in output DF of readtext::readtext()
+#' Title Search for specific text in tibble text column
 #'
-#' @param df Tibble resulting form readtext::readtext(). must contain doc_id and
-#' text columns
+#' @param df Tibble containing a chatacter column. unique identifier is expectd in
+#' first column
 #' @param col_name quoted character string: name of new column containg results of search
-#' @param search_text quoted character string: regex pattern to search for
+#' @param search_text quoted character string: regex pattern to search for. small letters only!!!
 #' @param b_win integer: nnumber of characters before search strung to show
 #' @param f_win integer: nnumber of characters after search strung to show
 #'
@@ -16,24 +16,16 @@ text_vector_df <- function(df,
                            output_col,
                            search_text,
                            b_win = 10,
-                           f_win = 80){
+                           f_win = 80) {
 
-    browser()
+    col_sym <- rlang::ensym(col_to_search)
+    out_sym <- rlang::ensym(output_col)
 
-    ensym_col_to_search <- ensyms(col_to_search)
-    out_c <- ensym(output_col)
-
-    out
-
-    out <- df %>%
-        dplyr::rowwise() %>%
+    df %>%
         dplyr::mutate(
-            "{out_c}" := list(locate_text_to_vector(stringr::str_to_lower(!!ensym_col_to_search),
-                                                       search_text, b_win, f_win))
-        ) %>%
-        tidyr::unnest(!!out_c) %>%
-        dplyr::relocate(!!out_c, .after = 1) %>%
-        dplyr::ungroup()
-
-    return(out)
+            "{rlang::as_string(out_sym)}" :=
+                locate_text_to_vector(!!col_sym, search_text, b_win, f_win)
+        )  %>%
+        tidyr::unnest(!!out_sym) %>%   # flatten so one match per row
+        dplyr::relocate(!!out_sym, .after = 1)
 }

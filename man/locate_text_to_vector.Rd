@@ -19,11 +19,10 @@ locate_text_to_vector(col, pattern, back_window = 10, front_window = 80)
 vector of strings
 }
 \description{
-Tibble mut grouped first using rowwise()
 Used within mutate(). Takes column name (unquoted) and text (in quotes),
 searches for text in this column, and returns its location. Then text is
 extracted and returned as a charachter vector
-Mutate call has to be within a list, that is later unnet
+Mutate call has to be within a list, that is later unnested
 }
 \examples{
 df <- tibble::tibble(col_id = letters[1:2], col_text = c("I love ananas", "I love lololo"))
