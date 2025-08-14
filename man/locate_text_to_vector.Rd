@@ -2,29 +2,52 @@
 % Please edit documentation in R/locate_text_to_vector.R
 \name{locate_text_to_vector}
 \alias{locate_text_to_vector}
-\title{Locate Pattern in Character Columns within Mutate}
+\title{Extract text snippets around a search term in a data frame column}
 \usage{
-locate_text_to_vector(col, pattern, back_window = 10, front_window = 80)
+locate_text_to_vector(
+  df,
+  col_to_search,
+  pattern,
+  back_window = 10,
+  front_window = 80
+)
 }
 \arguments{
-\item{col}{column name unquoted}
+\item{df}{A data frame or tibble.}
 
-\item{pattern}{text un quotes}
+\item{col_to_search}{The column in \code{df} to search (unquoted).}
 
-\item{back_window}{number of characters before search term to include in output}
+\item{pattern}{A string or regular expression to search for.}
 
-\item{front_window}{number of characters after search term to include in output}
+\item{back_window}{Number of characters to include before the match (default: 10).}
+
+\item{front_window}{Number of characters to include after the match (default: 80).}
 }
 \value{
-vector of strings
+A data frame with one row per match. Contains all original columns
+plus a new column \code{snippet} with the extracted text.
+The \code{snippet} column is always placed in the second position
+of the returned data frame for easier viewing in the console.
+If no matches are found in a row, the snippet is \code{NA}.
 }
 \description{
-Used within mutate(). Takes column name (unquoted) and text (in quotes),
-searches for text in this column, and returns its location. Then text is
-extracted and returned as a charachter vector
-Mutate call has to be within a list, that is later unnested
+Searches a character column in a data frame for a pattern, and returns
+a new data frame where each match is on its own row, along with a
+snippet of text surrounding the match. The search is case-insensitive,
+but the returned snippet preserves the original casing.
 }
 \examples{
-df <- tibble::tibble(col_id = letters[1:2], col_text = c("I love ananas", "I love lololo"))
-df |> dplyr::rowwise() |> dplyr::mutate(lo = list(locate_text_to_vector(col_text, "lo", 2, 7)))
+library(dplyr)
+
+df <- tibble(
+  id = 1:3,
+  text = c(
+    "This is a keyword in the middle of the sentence for testing.",
+    "Another keyword appears here, and another keyword later.",
+    "No match here."
+  )
+)
+
+locate_text_to_vector(df, text, "keyword", 5, 15)
+
 }

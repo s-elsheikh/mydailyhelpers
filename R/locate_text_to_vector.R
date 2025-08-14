@@ -1,51 +1,63 @@
-#' Locate Pattern in Character Columns within Mutate
+#' Extract text snippets around a search term in a data frame column
 #'
-#' Used within mutate(). Takes column name (unquoted) and text (in quotes),
-#' searches for text in this column, and returns its location. Then text is
-#' extracted and returned as a charachter vector
-#' Mutate call has to be within a list, that is later unnested
+#' Searches a character column in a data frame for a pattern, and returns
+#' a new data frame where each match is on its own row, along with a
+#' snippet of text surrounding the match. The search is case-insensitive,
+#' but the returned snippet preserves the original casing.
 #'
+#' @param df A data frame or tibble.
+#' @param col_to_search The column in \code{df} to search (unquoted).
+#' @param pattern A string or regular expression to search for.
+#' @param back_window Number of characters to include before the match (default: 10).
+#' @param front_window Number of characters to include after the match (default: 80).
 #'
-#'
-#'
-#'
-#' @param col column name unquoted
-#' @param pattern text un quotes
-#' @param back_window number of characters before search term to include in output
-#' @param front_window number of characters after search term to include in output
-#'
-#' @return vector of strings
-#' @export
+#' @return A data frame with one row per match. Contains all original columns
+#' plus a new column \code{snippet} with the extracted text.
+#' The \code{snippet} column is always placed in the second position
+#' of the returned data frame for easier viewing in the console.
+#' If no matches are found in a row, the snippet is \code{NA}.
 #'
 #' @examples
-#' df <- tibble::tibble(col_id = letters[1:2], col_text = c("I love ananas", "I love lololo"))
-#' df |> dplyr::rowwise() |> dplyr::mutate(lo = list(locate_text_to_vector(col_text, "lo", 2, 7)))
-locate_text_to_vector <- function(col, pattern, back_window = 10, front_window = 80){
-    # browser()
-    # if the string is short, always keep sub aurguments
-    # within nchar of string
-    # added str_to_lower here
-    locate_text_to_vector <- function(text_vec, pattern, back_window = 10, front_window = 80){
-        # browser()
-        # if the string is short, always keep sub aurguments
-        # within nchar of string
-        # added str_to_lower here
-        text_vec <- stringr::str_to_lower(text_vec)
+#' library(dplyr)
+#'
+#' df <- tibble(
+#'   id = 1:3,
+#'   text = c(
+#'     "This is a keyword in the middle of the sentence for testing.",
+#'     "Another keyword appears here, and another keyword later.",
+#'     "No match here."
+#'   )
+#' )
+#'
+#' locate_text_to_vector(df, text, "keyword", 5, 15)
+#'
+#' @export
 
-        purrr::map(
-            text_vec,
-            function(txt) {
-                if (is.na(txt)) return(NA_character_)
+locate_text_to_vector <- function(df, col_to_search, pattern,
+                                  back_window = 10, front_window = 80) {
 
-                posis_list <- stringr::str_locate_all(txt, pattern)
-                if (length(posis_list[[1]]) == 0) return(NA_character_)
+    col_sym <- rlang::ensym(col_to_search)
 
-                starts <- pmax(posis_list[[1]][, 1] - back_window, 1)
-                ends   <- pmin(posis_list[[1]][, 1] + front_window, nchar(txt))
+    df %>%
+        dplyr::mutate(
+            snippet = purrr::map(
+                !!col_sym,
+                function(txt) {
+                    if (is.na(txt)) return(NA_character_)
 
-                stringr::str_sub(txt, starts, ends)
-            }
-        )
-    }
+                    # Use case-insensitive search but keep original casing in snippet
+                    posis_list <- stringr::str_locate_all(stringr::str_to_lower(txt),
+                                                          stringr::str_to_lower(pattern))
 
+                    if (nrow(posis_list[[1]]) == 0) return(NA_character_)
+
+                    starts <- pmax(posis_list[[1]][, 1] - back_window, 1)
+                    ends   <- pmin(posis_list[[1]][, 1] + front_window, nchar(txt))
+
+                    stringr::str_sub(txt, starts, ends)
+                }
+            )
+        ) %>%
+        tidyr::unnest(snippet) %>%
+        dplyr::relocate(snippet, .after = 1)
 }

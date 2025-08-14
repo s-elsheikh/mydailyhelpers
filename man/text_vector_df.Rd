@@ -2,7 +2,7 @@
 % Please edit documentation in R/text_vector_df.R
 \name{text_vector_df}
 \alias{text_vector_df}
-\title{Title Search for specific text in tibble text column}
+\title{Deprecated: Search for specific text in a tibble text column}
 \usage{
 text_vector_df(
   df,
@@ -14,20 +14,32 @@ text_vector_df(
 )
 }
 \arguments{
-\item{df}{Tibble containing a chatacter column. unique identifier is expectd in
-first column}
+\item{df}{Tibble containing a character column. A unique identifier is expected in
+the first column.}
 
-\item{search_text}{quoted character string: regex pattern to search for. small letters only!!!}
+\item{col_to_search}{Unquoted column name in \code{df} to search.}
 
-\item{b_win}{integer: nnumber of characters before search strung to show}
+\item{output_col}{Unquoted name for the new column that would have contained search results.}
 
-\item{f_win}{integer: nnumber of characters after search strung to show}
+\item{search_text}{Quoted string: regex pattern to search for. Lowercase letters only.}
 
-\item{col_name}{quoted character string: name of new column containg results of search}
+\item{b_win}{Integer: number of characters before the search string to include in the snippet.}
+
+\item{f_win}{Integer: number of characters after the search string to include in the snippet.}
 }
 \value{
-Tibble, second column is the requested column
+The function does not return a value; it always stops with an error.
+Originally, it returned a tibble with one row per match, and the second column
+contained the requested output column.
 }
 \description{
-Title Search for specific text in tibble text column
+This function is \strong{deprecated}. Use \code{locate_text_to_vector()} instead.
+It was used to search a character column in a tibble for a regex pattern
+and return a new column with snippets of text surrounding each match.
+The second column of the returned tibble contains the search results.
+}
+\examples{
+\dontrun{
+text_vector_df(df, col_to_search = text, output_col = snippet, search_text = "keyword")
+}
 }

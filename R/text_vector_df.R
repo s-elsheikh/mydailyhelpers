@@ -1,22 +1,37 @@
-#' Title Search for specific text in tibble text column
+#' @title Deprecated: Search for specific text in a tibble text column
 #'
-#' @param df Tibble containing a chatacter column. unique identifier is expectd in
-#' first column
-#' @param col_name quoted character string: name of new column containg results of search
-#' @param search_text quoted character string: regex pattern to search for. small letters only!!!
-#' @param b_win integer: nnumber of characters before search strung to show
-#' @param f_win integer: nnumber of characters after search strung to show
+#' @description
+#' This function is **deprecated**. Use \code{locate_text_to_vector()} instead.
+#' It was used to search a character column in a tibble for a regex pattern
+#' and return a new column with snippets of text surrounding each match.
+#' The second column of the returned tibble contains the search results.
 #'
-#' @return Tibble, second column is the requested column
+#' @param df Tibble containing a character column. A unique identifier is expected in
+#' the first column.
+#' @param col_to_search Unquoted column name in \code{df} to search.
+#' @param output_col Unquoted name for the new column that would have contained search results.
+#' @param search_text Quoted string: regex pattern to search for. Lowercase letters only.
+#' @param b_win Integer: number of characters before the search string to include in the snippet.
+#' @param f_win Integer: number of characters after the search string to include in the snippet.
+#'
+#' @return The function does not return a value; it always stops with an error.
+#' Originally, it returned a tibble with one row per match, and the second column
+#' contained the requested output column.
+#'
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' text_vector_df(df, col_to_search = text, output_col = snippet, search_text = "keyword")
+#' }
 text_vector_df <- function(df,
                            col_to_search,
                            output_col,
                            search_text,
                            b_win = 10,
                            f_win = 80) {
+
+    stop("Deprecated, use locate_text_to_vector() instead", call. = FALSE)
 
     col_sym <- rlang::ensym(col_to_search)
     out_sym <- rlang::ensym(output_col)
